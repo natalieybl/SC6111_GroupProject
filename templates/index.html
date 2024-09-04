@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BTC/USDT Trading | Crypto Exchange</title>
+
+        <!--CSS-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
+        <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+
+        <!--JS-->
+        <script src="https://cdn.jsdelivr.net/npm/klinecharts@latest/dist/klinecharts.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ url_for('static', filename='main.js') }}" type="module"></script>
+
+    </head>
+    <body>
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Crypto Exchange</a>
+            </div>
+        </nav>
+        <!-- Trading view -->
+        <div class="container-fluid mt-3">
+            <div class="row">
+                <!-- Order book, Kline chart, and Market pairs -->
+                <div class="col-2-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Order Book</h5>
+                            <div class="order-book">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Price (USDT)</th>
+                                            <th>Amount (BTC)</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <!--tbody id="orderBookBody2"-->
+                                    <tbody id="orderBookBody">
+                                        <!-- Order book data will be inserted here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Kline chart and Place order form -->
+                <div class="col-9">
+                    <!-- Kline chart -->
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">BTC/USDT <span class="text-muted">59,055.81</span></h5>
+                            <div id="klineChart"></div>
+                        </div>
+                    </div>
+                    <!-- Place order form -->
+                    <div class="card" id="order">
+                        <div class="card-body">
+                            <h5 class="card-title">Place Order</h5>
+                            <div class="row">
+                                <div class="col-md-6" id="buy" role="tabpanel"
+                                    aria-labelledby="buy-tab">
+                                    <form>
+                                        <div class="mb-3">
+                                            <label for="buyPrice" class="form-label">Price</label>
+                                            <input type="number" class="form-control" id="buyPrice"
+                                                placeholder="USDT">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="buyAmount" class="form-label">Amount</label>
+                                            <input type="number" class="form-control" id="buyAmount"
+                                                placeholder="BTC">
+                                        </div>
+                                        <button type="submit" class="btn btn-buy w-100">Buy BTC</button>
+                                    </form>
+                                </div>
+                                <div class="col-md-6" id="sell" role="tabpanel" aria-labelledby="sell-tab">
+                                    <form>
+                                        <div class="mb-3">
+                                            <label for="sellPrice" class="form-label">Price</label>
+                                            <input type="number" class="form-control" id="sellPrice"
+                                                placeholder="USDT">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="sellAmount" class="form-label">Amount</label>
+                                            <input type="number" class="form-control" id="sellAmount"
+                                                placeholder="BTC">
+                                        </div>
+                                        <button type="submit" class="btn btn-sell w-100">Sell BTC</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Market pairs -->
+                <div class="col-2-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Market Pairs</h5>
+                            <div class="pair-list">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Pair</th>
+                                            <th>Price</th>
+                                            <th>Change</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="marketPairsBody">
+                                        <!-- Market pairs data will be inserted here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function(){
+        // Handle Buy BTC submission
+        $("#buy form").submit(function(event) {
+            event.preventDefault();
+            var buyPrice = $("#buyPrice").val();
+            var buyAmount = $("#buyAmount").val();
+            
+            $.ajax({
+                url: "/buy_btc", 
+                method: "POST",
+                data: JSON.stringify({
+                    price: buyPrice,
+                    amount: buyAmount
+                }),
+                contentType: "application/json",
+                success: function(response) {
+                    alert("Buy Order Submitted: " + response.message);
+                }
+            });
+        });
+
+        // Handle Sell BTC submission
+        $("#sell form").submit(function(event) {
+            event.preventDefault();
+            var sellPrice = $("#sellPrice").val();
+            var sellAmount = $("#sellAmount").val();
+            
+            $.ajax({
+                url: "/sell_btc", 
+                method: "POST",
+                data: JSON.stringify({
+                    price: sellPrice,
+                    amount: sellAmount
+                }),
+                contentType: "application/json",
+                success: function(response) {
+                    alert("Sell Order Submitted: " + response.message);
+                }
+            });
+        });
+    });
+
+    $(document).ready(function() {
+    // Function to populate the order book
+    function populateOrderBook() {
+        $.ajax({
+            url: '/orderbook',
+            method: 'GET',
+            success: function(data) {
+                const buylist = data.buylist;
+                const selllist = data.selllist;
+                const orderBookBody = $("#orderBookBody2");
+                
+                // Clear the current table content
+                orderBookBody.empty();
+                
+                // Add Buy Orders
+                buylist.forEach(function(order) {
+                    orderBookBody.append(`
+                        <tr>
+                            <td>${order[0]}</td>
+                            <td>${order[1]}</td>
+                            <td>${order[2]}</td>
+                        </tr>
+                    `);
+                });
+
+                // Add Sell Orders
+                selllist.forEach(function(order) {
+                    orderBookBody.append(`
+                        <tr>
+                            <td>${order[0]}</td>
+                            <td>${order[1]}</td>
+                            <td>${order[2]}</td>
+                        </tr>
+                    `);
+                });
+            },
+            error: function(error) {
+                console.log("Error fetching order book data:", error);
+            }
+        });
+    }
+
+    // Populate the order book when the page loads
+    populateOrderBook();
+});
+
+</script>
+
+    </body>
+</html>
