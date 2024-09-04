@@ -14,6 +14,7 @@
         <script src="https://cdn.jsdelivr.net/npm/klinecharts@latest/dist/klinecharts.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
         <script src="{{ url_for('static', filename='main.js') }}" type="module"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     </head>
     <body>
@@ -40,8 +41,7 @@
                                             <th>Total</th>
                                         </tr>
                                     </thead>
-                                    <!--tbody id="orderBookBody2"-->
-                                    <tbody id="orderBookBody">
+                                    <tbody id="orderBookBodyDB">
                                         <!-- Order book data will be inserted here -->
                                     </tbody>
                                 </table>
@@ -68,13 +68,15 @@
                                     <form>
                                         <div class="mb-3">
                                             <label for="buyPrice" class="form-label">Price</label>
-                                            <input type="number" class="form-control" id="buyPrice"
-                                                placeholder="USDT">
+                                            <input type="number" class="form-control" id="buyPrice" placeholder="USDT">
                                         </div>
                                         <div class="mb-3">
                                             <label for="buyAmount" class="form-label">Amount</label>
-                                            <input type="number" class="form-control" id="buyAmount"
-                                                placeholder="BTC">
+                                            <input type="number" class="form-control" id="buyAmount" placeholder="BTC">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="buyTotal" class="form-label">Total</label>
+                                            <input type="number" class="form-control" id="buyTotal" placeholder="USDT">
                                         </div>
                                         <button type="submit" class="btn btn-buy w-100">Buy BTC</button>
                                     </form>
@@ -83,13 +85,15 @@
                                     <form>
                                         <div class="mb-3">
                                             <label for="sellPrice" class="form-label">Price</label>
-                                            <input type="number" class="form-control" id="sellPrice"
-                                                placeholder="USDT">
+                                            <input type="number" class="form-control" id="sellPrice" placeholder="USDT">
                                         </div>
                                         <div class="mb-3">
                                             <label for="sellAmount" class="form-label">Amount</label>
-                                            <input type="number" class="form-control" id="sellAmount"
-                                                placeholder="BTC">
+                                            <input type="number" class="form-control" id="sellAmount" placeholder="BTC">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="sellTotal" class="form-label">Total</label>
+                                            <input type="number" class="form-control" id="sellTotal" placeholder="USDT">
                                         </div>
                                         <button type="submit" class="btn btn-sell w-100">Sell BTC</button>
                                     </form>
@@ -122,97 +126,5 @@
                 </div>
             </div>
         </div>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function(){
-        // Handle Buy BTC submission
-        $("#buy form").submit(function(event) {
-            event.preventDefault();
-            var buyPrice = $("#buyPrice").val();
-            var buyAmount = $("#buyAmount").val();
-            
-            $.ajax({
-                url: "/buy_btc", 
-                method: "POST",
-                data: JSON.stringify({
-                    price: buyPrice,
-                    amount: buyAmount
-                }),
-                contentType: "application/json",
-                success: function(response) {
-                    alert("Buy Order Submitted: " + response.message);
-                }
-            });
-        });
-
-        // Handle Sell BTC submission
-        $("#sell form").submit(function(event) {
-            event.preventDefault();
-            var sellPrice = $("#sellPrice").val();
-            var sellAmount = $("#sellAmount").val();
-            
-            $.ajax({
-                url: "/sell_btc", 
-                method: "POST",
-                data: JSON.stringify({
-                    price: sellPrice,
-                    amount: sellAmount
-                }),
-                contentType: "application/json",
-                success: function(response) {
-                    alert("Sell Order Submitted: " + response.message);
-                }
-            });
-        });
-    });
-
-    $(document).ready(function() {
-    // Function to populate the order book
-    function populateOrderBook() {
-        $.ajax({
-            url: '/orderbook',
-            method: 'GET',
-            success: function(data) {
-                const buylist = data.buylist;
-                const selllist = data.selllist;
-                const orderBookBody = $("#orderBookBody2");
-                
-                // Clear the current table content
-                orderBookBody.empty();
-                
-                // Add Buy Orders
-                buylist.forEach(function(order) {
-                    orderBookBody.append(`
-                        <tr>
-                            <td>${order[0]}</td>
-                            <td>${order[1]}</td>
-                            <td>${order[2]}</td>
-                        </tr>
-                    `);
-                });
-
-                // Add Sell Orders
-                selllist.forEach(function(order) {
-                    orderBookBody.append(`
-                        <tr>
-                            <td>${order[0]}</td>
-                            <td>${order[1]}</td>
-                            <td>${order[2]}</td>
-                        </tr>
-                    `);
-                });
-            },
-            error: function(error) {
-                console.log("Error fetching order book data:", error);
-            }
-        });
-    }
-
-    // Populate the order book when the page loads
-    populateOrderBook();
-});
-
-</script>
-
     </body>
 </html>
