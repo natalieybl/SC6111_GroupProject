@@ -13,7 +13,7 @@ def index():
 def get_db_connection():
     try:
         connection = mariadb.connect(
-            user="pytest",         # Your MariaDB username
+            user="root",         # Your MariaDB username
             password="123456",     # Your MariaDB password
             host="localhost",             # Your MariaDB host
             port=3306,                    # Default MariaDB port
