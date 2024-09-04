@@ -24,61 +24,7 @@ const generateKlineData = (count = 100) => {
 // Set chart data
 chart.applyNewData(generateKlineData());
 
-// Generate sample order book data
-const generateOrderBook = () => {
-    const buyOrders = [];
-    const sellOrders = [];
-    let basePrice = 59055.81;
-
-    for (let i = 0; i < 10; i++) {
-        const buyPrice = basePrice - i * 5 - Math.random() * 2;
-        const sellPrice = basePrice + i * 5 + Math.random() * 2;
-        const amount = Math.random() * 2 + 0.1;
-
-        buyOrders.push({
-            price: buyPrice.toFixed(2),
-            amount: amount.toFixed(6),
-            total: (buyPrice * amount).toFixed(2)
-        });
-
-        sellOrders.push({
-            price: sellPrice.toFixed(2),
-            amount: amount.toFixed(6),
-            total: (sellPrice * amount).toFixed(2)
-        });
-    }
-
-    return { buyOrders, sellOrders };
-};
-
-// Populate order book
-const populateOrderBook = () => {
-    const { buyOrders, sellOrders } = generateOrderBook();
-    const orderBookBody = document.getElementById('orderBookBody');
-    orderBookBody.innerHTML = '';
-
-    sellOrders.reverse().forEach(order => {
-        orderBookBody.innerHTML += `
-            <tr class="text-danger">
-                <td>${order.price}</td>
-                <td>${order.amount}</td>
-                <td>${order.total}</td>
-            </tr>
-        `;
-    });
-
-    buyOrders.forEach(order => {
-        orderBookBody.innerHTML += `
-            <tr class="text-success">
-                <td>${order.price}</td>
-                <td>${order.amount}</td>
-                <td>${order.total}</td>
-            </tr>
-        `;
-    });
-};
-
-// Generate sample market pairs data
+// Populate market pairs with sample data
 const generateMarketPairs = () => {
     const pairs = [
         { name: 'ETH/USDT', basePrice: 3200 },
@@ -104,7 +50,7 @@ const generateMarketPairs = () => {
     });
 };
 
-// Populate market pairs
+// Populate market pairs table
 const populateMarketPairs = () => {
     const pairs = generateMarketPairs();
     const marketPairsBody = document.getElementById('marketPairsBody');
@@ -122,13 +68,113 @@ const populateMarketPairs = () => {
     });
 };
 
-// Initial population
-populateOrderBook();
-populateMarketPairs();
+// Function to populate order book from DB
+const populateOrderBookDB = () => {
+    $.ajax({
+        url: '/orderbook',
+        method: 'GET',
+        success: function(data) {
+            const buylist = data.buylist;
+            const selllist = data.selllist;
+            const orderBookBodyDB = $("#orderBookBodyDB");
 
-// Update data periodically
-setInterval(() => {
-    chart.updateData(generateKlineData(1)[0]);
-    populateOrderBook();
+            // Clear the current table content
+            orderBookBodyDB.empty();
+
+            // Add Sell Orders
+            selllist.forEach(function(order) {
+                orderBookBodyDB.append(`
+                    <tr class="text-danger">
+                        <td>${order[0]}</td>
+                        <td>${order[1]}</td>
+                        <td>${order[2]}</td>
+                    </tr>
+                `);
+            });
+
+            // Add Buy Orders
+            buylist.forEach(function(order) {
+                orderBookBodyDB.append(`
+                    <tr class="text-success">
+                        <td>${order[0]}</td>
+                        <td>${order[1]}</td>
+                        <td>${order[2]}</td>
+                    </tr>
+                `);
+            });
+        },
+        error: function(error) {
+            console.log("Error fetching order book data:", error);
+        }
+    });
+};
+
+// jQuery for handling user inputs and form submissions
+$(document).ready(function() {
+    // Calculate buy total
+    $("#buyPrice, #buyAmount").on("input", function() {
+        var buyPrice = parseFloat($("#buyPrice").val()) || 0;
+        var buyAmount = parseFloat($("#buyAmount").val()) || 0;
+        var buyTotal = buyPrice * buyAmount;
+        $("#buyTotal").val(buyTotal.toFixed(2));
+    });
+
+    // Calculate sell total
+    $("#sellPrice, #sellAmount").on("input", function() {
+        var sellPrice = parseFloat($("#sellPrice").val()) || 0;
+        var sellAmount = parseFloat($("#sellAmount").val()) || 0;
+        var sellTotal = sellPrice * sellAmount;
+        $("#sellTotal").val(sellTotal.toFixed(2));
+    });
+
+    // Handle Buy BTC submission
+    $("#buy form").submit(function(event) {
+        event.preventDefault();
+        var buyPrice = $("#buyPrice").val();
+        var buyAmount = $("#buyAmount").val();
+
+        $.ajax({
+            url: "/buy_btc",
+            method: "POST",
+            data: JSON.stringify({
+                price: buyPrice,
+                amount: buyAmount
+            }),
+            contentType: "application/json",
+            success: function(response) {
+                alert("Buy Order Submitted: " + response.message);
+            }
+        });
+    });
+
+    // Handle Sell BTC submission
+    $("#sell form").submit(function(event) {
+        event.preventDefault();
+        var sellPrice = $("#sellPrice").val();
+        var sellAmount = $("#sellAmount").val();
+
+        $.ajax({
+            url: "/sell_btc",
+            method: "POST",
+            data: JSON.stringify({
+                price: sellPrice,
+                amount: sellAmount
+            }),
+            contentType: "application/json",
+            success: function(response) {
+                alert("Sell Order Submitted: " + response.message);
+            }
+        });
+    });
+
+    // Populate tables on page load
+    populateOrderBookDB();
     populateMarketPairs();
-}, 5000);
+
+    // Periodically update tables and chart data
+    setInterval(() => {
+        chart.updateData(generateKlineData(1)[0]); // Update chart
+        populateOrderBookDB(); // Update order book from DB
+        populateMarketPairs(); // Update market pairs with sample data
+    }, 5000); // Updates every 5 seconds
+});
