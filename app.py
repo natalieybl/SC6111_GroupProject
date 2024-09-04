@@ -115,20 +115,3 @@ def get_order_book():
 if __name__ == '__main__':
     app.run(debug=True)
 
-
-    '''
-# Database connection configuration
-config = {
-    'host': 'localhost',      # Host where the MariaDB server is running
-    'port': 3306,             # Default port for MariaDB
-    'user': 'pytest',  # Replace with your MariaDB username
-    'password': '123456',  # Replace with your MariaDB password
-    'database': 'tokens'   # Replace with your database name
-}
-
-# Establish a connection to MariaDB
-conn = mariadb.connect(**config)
-
-# Create a cursor object to interact with the database
-cur = conn.cursor()
-'''
