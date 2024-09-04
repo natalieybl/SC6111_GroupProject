@@ -1,0 +1,33 @@
+--create database tokens if not exist.
+create database tokens;
+
+As root: 
+--create user
+CREATE USER 'root'@'localhost' IDENTIFIED BY '123456';
+
+--grant db access to user (root)
+GRANT ALL PRIVILEGES ON tokens.* TO 'root'@'localhost';
+FLUSH PRIVILEGES;
+
+--go to database named web_system
+USE tokens;
+
+--create table order_book
+CREATE TABLE order_book (
+    order_book_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT, 
+    order_price FLOAT, 
+    order_amount FLOAT, 
+    type CHAR(4)
+);
+
+
+--export schema and data to exportTable.sql
+--please change the path of the exportTable.sql
+mysqldump -u root -p tokens order_book > "C:\Users\Natalie\Downloads\test2\exportTable.sql"
+
+--please change the path of the exportTable.sql
+--create table and insert data using exportTable.sql
+mysql -u root -p tokens < "C:\Users\Natalie\Downloads\test2\exportTable.sql"
+
+
