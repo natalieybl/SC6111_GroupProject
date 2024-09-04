@@ -1,0 +1,98 @@
+body {
+    background-color: #1B1D23;
+    color: #eaecef;
+}
+.col-2-5 {
+    flex: 0 0 auto;
+    width: 21.828104%;
+}
+.col-9 {
+    flex: 0 0 auto;
+    width: 56.343793%;
+}
+.navbar {
+    background-color: #1B1D23;
+}
+
+.card {
+    background-color: #1B1D23;
+    margin: 0;
+    border: 0.1px solid rgba(255, 255, 255, 0.1); /* 添加白色边框 */
+    border-radius: 0; /* 移除圆角 */
+
+}
+/* 移除容器之间的内边距 */
+.row > [class*='col-'] {
+    padding: 0;
+}
+.table {
+    color: #eaecef;
+}
+#buy, #sell {
+    padding: 1rem;
+}
+.table thead th {
+    border-bottom: 1px solid #1B1D23;
+}
+
+.table td,
+.table th {
+    border-top: 1px solid #1B1D23;
+}
+
+.btn-buy {
+    background-color: #0ecb81;
+    border-color: #0ecb81;
+    color: #fff;
+}
+
+.btn-sell {
+    background-color: #f6465d;
+    border-color: #f6465d;
+    color: #fff;
+}
+
+.order-book {
+    height: 40rem;
+    overflow-y: auto;
+}
+
+.pair-list {
+    height: 40rem;
+    overflow-y: auto;
+}
+
+#klineChart {
+    height: 20rem;
+}
+#order {
+    height: 20rem;
+}
+.price-up {
+    color: #0ecb81;
+}
+
+.price-down {
+    color: #f6465d;
+}
+
+/* 修改输入框的背景颜色、文本颜色和边框颜色 */
+.form-control {
+    background-color: #2B3139; /* 背景颜色 */
+    color: #eaecef; /* 文本颜色 */
+    border: none;
+}
+
+/* 修改输入框在聚焦时的边框颜色 */
+.form-control:focus {
+    background-color: #2B3139; /* 背景颜色 */
+    color: #eaecef; /* 文本颜色 */
+    border: 1px solid #EFB90B; /* 聚焦时的边框颜色 */
+    box-shadow: none; /* 移除默认的聚焦阴影 */
+}
+
+/* 修改输入框占位符文字的颜色 */
+.form-control::placeholder {
+    color: #a0a0a0; /* 占位符文字颜色 */
+    opacity: 0.6; /* 确保颜色不透明 */
+}
