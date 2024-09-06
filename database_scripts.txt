@@ -18,7 +18,8 @@ CREATE TABLE order_book (
     user_id INT, 
     order_price FLOAT, 
     order_amount FLOAT, 
-    type CHAR(4)
+    type CHAR(4),
+    trans_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
