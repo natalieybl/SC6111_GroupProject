@@ -94,13 +94,13 @@ def get_order_book():
     cursor = connection.cursor()
     
     # Query buy list
-    cursor.execute("SELECT order_price, order_amount, (order_price * SUM(order_amount)) as total FROM order_book WHERE type = 'buy' GROUP BY order_price ORDER BY order_price DESC LIMIT 20")
+    cursor.execute("SELECT order_price, sum(order_amount), (order_price * SUM(order_amount)) as total FROM order_book WHERE type = 'buy' GROUP BY order_price ORDER BY order_price DESC LIMIT 10")
     #SELECT price, amount, (price * amount) as total FROM order_book
     #SELECT user_id,type,order_price,SUM(order_amount) FROM order_book WHERE type = 'buy' GROUP BY order_price ORDER BY order_price DESC LIMIT 20
     buylist = cursor.fetchall()
     
     # Query sell list
-    cursor.execute("SELECT order_price, order_amount, (order_price * SUM(order_amount)) as total FROM order_book WHERE type = 'sell' GROUP BY order_price ORDER BY order_price DESC LIMIT 20")
+    cursor.execute("SELECT order_price, sum(order_amount), (order_price * SUM(order_amount)) as total FROM order_book WHERE type = 'sell' GROUP BY order_price ORDER BY order_price DESC LIMIT 10")
     selllist = cursor.fetchall()
     
     # Close connection
